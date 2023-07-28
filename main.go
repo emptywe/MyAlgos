@@ -1,5 +1,9 @@
 package main
 
+func main() {
+
+}
+
 /*
 1
 Search Insert Position
@@ -227,4 +231,168 @@ func maxSubArray(nums []int) int {
 		}
 	}
 	return maxSum
+}
+
+/*
+8
+Destroying Asteroids
+
+You are given an integer mass, which represents the original mass of a planet.
+You are further given an integer array asteroids, where asteroids[i] is the mass of the ith asteroid.
+
+You can arrange for the planet to collide with the asteroids in any arbitrary order.
+If the mass of the planet is greater than or equal to the mass of the asteroid,
+the asteroid is destroyed and the planet gains the mass of the asteroid. Otherwise, the planet is destroyed.
+
+Return true if all asteroids can be destroyed. Otherwise, return false.
+*/
+
+func asteroidsDestroyed(mass int, asteroids []int) bool {
+	if len(asteroids) == 0 {
+		return true
+	}
+	stack := []int{}
+	for i := 0; i < len(asteroids); i++ {
+		if asteroids[i] <= mass {
+			mass += asteroids[i]
+		} else {
+			stack = append(stack, asteroids[i])
+		}
+	}
+	if len(asteroids) == len(stack) {
+		return false
+	}
+
+	return asteroidsDestroyed(mass, stack)
+}
+
+/*
+9
+Count Asterisks
+
+You are given a string s, where every two consecutive vertical bars '|' are grouped into a pair.
+In other words, the 1st and 2nd '|' make a pair, the 3rd and 4th '|' make a pair, and so forth.
+
+Return the number of '*' in s, excluding the '*' between each pair of '|'.
+
+Note that each '|' will belong to exactly one pair.
+*/
+
+func countAsterisks(s string) int {
+	var opened bool
+	counter := 0
+	for _, v := range s {
+		if v == '*' && !opened {
+			counter++
+		} else if v == '|' && !opened {
+			opened = true
+		} else if v == '|' && opened {
+			opened = false
+		}
+	}
+	return counter
+}
+
+/*
+10
+Jump Game
+
+You are given an integer array nums.
+You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
+
+Return true if you can reach the last index, or false otherwise.
+*/
+
+func canJump(nums []int) bool {
+	best := 0
+	for i := 0; i < len(nums); i++ {
+		if i+nums[i] > best {
+			best = i + nums[i]
+		}
+
+		if nums[i] == 0 && i < len(nums)-1 && i == best {
+			return false
+		}
+	}
+
+	return true
+}
+
+/*
+11
+Longest Subarray of 1's After Deleting One Element
+
+Given a binary array nums, you should delete one element from it.
+
+Return the size of the longest non-empty subarray containing only 1's in the resulting array. Return 0 if there is no such subarray.
+*/
+
+func longestSubarray(nums []int) int {
+	var deleted bool
+	end := 0
+	start := 0
+	maxCounter := 0
+	counter := 0
+	for end < len(nums) {
+		if nums[end] == 0 && !deleted {
+			start = end
+			deleted = true
+		} else if nums[end] == 0 && deleted {
+			end = start
+			counter = 0
+			deleted = false
+		} else {
+			counter++
+		}
+		if counter > maxCounter {
+			maxCounter = counter
+		}
+		end++
+	}
+
+	if maxCounter == len(nums) {
+		maxCounter -= 1
+	}
+
+	return maxCounter
+}
+
+/*
+12
+Validate Binary Search Tree
+
+Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+
+A valid BST is defined as follows:
+
+The left
+subtree
+ of a node contains only nodes with keys less than the node's key.
+The right subtree of a node contains only nodes with keys greater than the node's key.
+Both the left and right subtrees must also be binary search trees.
+
+*/
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+func isValidBST(root *TreeNode) bool {
+	return validate(root, nil, nil)
+}
+
+func validate(r *TreeNode, min, max *int) bool {
+	if r == nil {
+		return true
+	}
+
+	if min != nil && r.Val <= *min {
+		return false
+	}
+	if max != nil && r.Val >= *max {
+		return false
+	}
+	return validate(r.Left, min, &r.Val) && validate(r.Right, &r.Val, max)
 }
